@@ -14,6 +14,7 @@ import mongoose from "mongoose";
 import { UserModel } from "./models/user.js";
 import bcrypt from "bcrypt"
 import jwt from "jsonwebtoken";
+import flash from "connect-flash"
 
 const app = express()
 
@@ -27,6 +28,7 @@ app.set("views",path.join(__dirname,"views"))
 app.set("view engine","handlebars")
 app.use(express.static("./views"))
 app.use(cookieParser())
+app.use(flash())
 const advancedOptions = {useNewUrlParser:true,useUnifiedTopology:true}
 
 
@@ -153,6 +155,14 @@ app.get("/api/productos-test",async (req,res)=>{
   res.render("products",{allProducts})
 })
 
+app.post("/api/productos-test" , async(req,res)=>{
+  const {title,price,image} = req.body
+  console.log(title,price,image)
+  console.log(req.body )
+  await productsClass.save({title,price,image})
+  res.redirect("/api/productos-test")
+})
+
 
 /* 
 
@@ -168,7 +178,7 @@ app.get("/login",(req,res)=>{
     res.redirect("/")
   }
   else{
-    res.render("login")
+    res.render("login",{error:req.flash('error')[0]})
   }
 })
 
@@ -202,16 +212,10 @@ passport.use("loginStrategy",new LocalStrategy(
 
 app.post("/login",passport.authenticate("loginStrategy",{
   failureRedirect:"/login",
-  failureMessage:true
+  failureMessage:true,
+  failureFlash: true
 }), async (req,res)=>{
-  const {password,mail} = req.body
-  const allUsers = await sessionsClass.getAll()
-  const userFound = allUsers.find(elm => elm.mail === mail)
-  if(userFound){
-    if(userFound.password===password){
-      req.session.user = userFound
-    }
-  }
+  req.session.user = req.user
   res.redirect("/")
 })
 
@@ -224,13 +228,13 @@ app.post("/login",passport.authenticate("loginStrategy",{
 
 
 app.get("/signup",(req,res)=>{
-  res.render("signup")
+  res.render("signup",{error:req.flash('error')[0]})
 })
 
 passport.use("signupStrategy",new LocalStrategy(
   {
     passReqToCallback:true,
-    usernameField:"mail"
+    usernameField:"mail",
   },
   (req,username,password,done)=>{
     UserModel.findOne({mail:username},(err,userFound)=>{
@@ -256,7 +260,8 @@ passport.use("signupStrategy",new LocalStrategy(
 
 app.post("/signup", passport.authenticate("signupStrategy",{
   failureRedirect:"/signup",
-  failureMessage:true
+  failureMessage:true,
+  failureFlash:true
 }),(req,res)=>{
   res.redirect("/login")
 })
