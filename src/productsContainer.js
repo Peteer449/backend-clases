@@ -1,5 +1,4 @@
 import {faker} from "@faker-js/faker"
-import {readFileSync} from "fs"
 import admin from "firebase-admin"
 
 const {commerce,image} = faker

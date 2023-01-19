@@ -1,4 +1,5 @@
 import express from "express"
+import { envConfig } from "./envconfig.js"
 import {Server} from "socket.io"
 import path from "path"
 import bodyParser from "body-parser"
@@ -13,8 +14,9 @@ import { Strategy as LocalStrategy} from "passport-local";
 import mongoose from "mongoose";
 import { UserModel } from "./models/user.js";
 import bcrypt from "bcrypt"
-import jwt from "jsonwebtoken";
 import flash from "connect-flash"
+import parseArgs from "minimist"
+import { fork } from "child_process"
 
 const app = express()
 
@@ -39,7 +41,7 @@ const advancedOptions = {useNewUrlParser:true,useUnifiedTopology:true}
 */
 app.use(session({
   store: MongoStore.create({
-    mongoUrl:"mongodb+srv://peteer449:coder@coderback.dmtsis3.mongodb.net/sessionsDB?retryWrites=true&w=majority",
+    mongoUrl:envConfig.BASE_DE_DATOS_SESSIONSDB,
     mongoOptions:advancedOptions,
     ttl:60
   }),
@@ -47,7 +49,7 @@ app.use(session({
   resave:false,
   saveUninitialized:false
 }))
-mongoose.connect("mongodb+srv://peteer449:coder@coderback.dmtsis3.mongodb.net/coderDB?retryWrites=true&w=majority",{
+mongoose.connect(envConfig.BASE_DE_DATOS_CODERDB,{
   useNewUrlParser:true,
   useUnifiedTopology:true,
 },(error=>{
@@ -75,13 +77,13 @@ passport.deserializeUser((id,done)=>{
 })
 
 //Port of the server
-const PORT = process.env.PORT || 8080
+const optionsMinimist = {default:{p:8080},alias:{p:"port"}}
+const argumentsMinimist = parseArgs(process.argv.slice(2),optionsMinimist)
+const PORT = argumentsMinimist.port
 
 //Import classes
 import productsContainer from "./productsContainer.js";
 import chatContainer from "./chatContainer.js";
-import sessionsContainer from "./sessionsContainer.js";
-const sessionsClass = new sessionsContainer()
 const productsClass = new productsContainer()
 const chatClass = new chatContainer()
 
@@ -161,6 +163,33 @@ app.post("/api/productos-test" , async(req,res)=>{
   console.log(req.body )
   await productsClass.save({title,price,image})
   res.redirect("/api/productos-test")
+})
+
+app.get("/info",(req,res)=>{
+  const {argv,platform,versions,pid,execPath,memoryUsage} = process
+  res.json(
+    {
+      argumentosDeEntrada:argumentsMinimist,
+      plataforma:platform,
+      versionNode:versions.node,
+      RSS:memoryUsage.rss(),
+      pathEjecucion:execPath,
+      processID:pid,
+      carpetaProyecto:argv[1]
+    }
+  )
+})
+
+app.get("/api/randoms",(req,res)=>{
+  const child = fork("apiRandoms.js")
+  if(req.query.cant){
+    child.send(req.query.cant)
+  }else{
+    child.send(100000000)
+  }
+  child.on("message",childNumbers=>{
+    res.json({...childNumbers})
+  })
 })
 
 

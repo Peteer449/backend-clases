@@ -1,15 +1,11 @@
 const socket = io()
 let chatInput = document.getElementById("chatInput")
 let chatForm = document.getElementById("chatForm")
-let productsTable = document.getElementById("productsTable")
-let productForm = document.getElementById("productForm")
-let title = document.getElementById("title")
-let price = document.getElementById("price")
-let image = document.getElementById("image")
-let user;
+let user='<%=Session["user"]%>';
 
 
-  chatForm.addEventListener("submit",(event)=>{
+chatForm.addEventListener("submit",(event)=>{
+    console.log(user)
     event.preventDefault()
     socket.emit("chatInput",{author:user, message:chatInput.value})
     chatInput.value = ""
