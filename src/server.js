@@ -17,9 +17,11 @@ import bcrypt from "bcrypt"
 import flash from "connect-flash"
 import parseArgs from "minimist"
 import { fork } from "child_process"
+import os from "os"
+import cluster from "cluster"
 
 const app = express()
-
+mongoose.set('strictQuery', true);
 app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({extended:true}));
 app.use(express.json())
@@ -77,9 +79,10 @@ passport.deserializeUser((id,done)=>{
 })
 
 //Port of the server
-const optionsMinimist = {default:{p:8080},alias:{p:"port"}}
+const optionsMinimist = {default:{p:8080, modo:"fork"},alias:{p:"port"}}
 const argumentsMinimist = parseArgs(process.argv.slice(2),optionsMinimist)
 const PORT = argumentsMinimist.port
+const MODO = argumentsMinimist.modo
 
 //Import classes
 import productsContainer from "./productsContainer.js";
@@ -88,8 +91,20 @@ const productsClass = new productsContainer()
 const chatClass = new chatContainer()
 
 //Server listener
-const server = app.listen(PORT,()=>console.log(`Server listening on port ${PORT}`))
-
+let server
+const numberCpus = os.cpus().length
+if(cluster.isPrimary && MODO=="cluster"){
+  for(let i = 0; i<numberCpus;i++){
+    cluster.fork()
+  }
+  cluster.on("exit",worker=>{
+    console.log(`Este subproceso (${worker.process.pid}) dejo de funcionar`)
+    //cluster.fork()
+  })
+}else{
+  server = app.listen(PORT,()=>console.log(`Server listening on port ${PORT} on process ${process.pid}`))
+}
+//server = app.listen(PORT,()=>console.log(`Server listening on port ${PORT} on process ${process.pid}`))
 
 /*
 
@@ -175,7 +190,8 @@ app.get("/info",(req,res)=>{
       RSS:memoryUsage.rss(),
       pathEjecucion:execPath,
       processID:pid,
-      carpetaProyecto:argv[1]
+      carpetaProyecto:argv[1],
+      procesadores:os.cpus()
     }
   )
 })

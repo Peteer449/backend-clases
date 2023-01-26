@@ -6,7 +6,8 @@
   "type": "module",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node src/server.js"
+    "start": "node src/server.js",
+    "build": "babel src/server.js -o index.js"
   },
   "keywords": [],
   "author": "",
@@ -40,5 +41,12 @@
     "session-file-store": "^1.5.0",
     "socket.io": "^4.5.3",
     "sqlite3": "^5.1.4"
+  },
+  "devDependencies": {
+    "@babel/cli": "^7.20.7",
+    "@babel/core": "^7.20.12",
+    "@babel/plugin-syntax-import-meta": "^7.10.4",
+    "@babel/preset-env": "^7.20.2",
+    "babel-preset-env": "^1.7.0"
   }
 }
