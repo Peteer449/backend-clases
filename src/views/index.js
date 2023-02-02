@@ -5,7 +5,6 @@ let user='<%=Session["user"]%>';
 
 
 chatForm.addEventListener("submit",(event)=>{
-    console.log(user)
     event.preventDefault()
     socket.emit("chatInput",{author:user, message:chatInput.value})
     chatInput.value = ""

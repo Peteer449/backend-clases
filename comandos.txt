@@ -1,0 +1,14 @@
+//Empieza un servidor 
+node --prof src/server.js
+
+//probar rutas desde la consola
+curl -X GET "http://localhost:8080/api/randoms"
+
+//transformar el archivo isolate a algo entendible
+node --prof-process isolate.log > result.txt
+
+//Iniciar servidor con 0x
+0x src/server.js
+
+//Para hacer test(similar a artillery)
+node src/benchmark.js

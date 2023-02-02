@@ -1,4 +1,4 @@
-import express from "express"
+import express, { Router } from "express"
 import { envConfig } from "./envconfig.js"
 import {Server} from "socket.io"
 import path from "path"
@@ -19,6 +19,8 @@ import parseArgs from "minimist"
 import { fork } from "child_process"
 import os from "os"
 import cluster from "cluster"
+import compression from "compression"
+import { logger } from "./logger/logger.js"
 
 const app = express()
 mongoose.set('strictQuery', true);
@@ -33,14 +35,14 @@ app.set("view engine","handlebars")
 app.use(express.static("./views"))
 app.use(cookieParser())
 app.use(flash())
-const advancedOptions = {useNewUrlParser:true,useUnifiedTopology:true}
-
+app.use(compression())
 
 /*
 
 -------COOKIES AND MONGODB-------
 
 */
+const advancedOptions = {useNewUrlParser:true,useUnifiedTopology:true}
 app.use(session({
   store: MongoStore.create({
     mongoUrl:envConfig.BASE_DE_DATOS_SESSIONSDB,
@@ -55,8 +57,8 @@ mongoose.connect(envConfig.BASE_DE_DATOS_CODERDB,{
   useNewUrlParser:true,
   useUnifiedTopology:true,
 },(error=>{
-  if(error)console.log("Conexion fallida")
-  console.log("conectado correctamente")
+  if(error)logger.error("Conexion fallida")
+  logger.info("conectado correctamente")
 }))
 
 
@@ -98,11 +100,11 @@ if(cluster.isPrimary && MODO=="cluster"){
     cluster.fork()
   }
   cluster.on("exit",worker=>{
-    console.log(`Este subproceso (${worker.process.pid}) dejo de funcionar`)
-    //cluster.fork()
+    logger.info(`Este subproceso (${worker.process.pid}) dejo de funcionar`)
+    cluster.fork()
   })
 }else{
-  server = app.listen(PORT,()=>console.log(`Server listening on port ${PORT} on process ${process.pid}`))
+  server = app.listen(PORT,()=>logger.info(`Server listening on port ${PORT} on process ${process.pid}`))
 }
 //server = app.listen(PORT,()=>console.log(`Server listening on port ${PORT} on process ${process.pid}`))
 
@@ -151,7 +153,22 @@ io.on("connection",async (socket)=>{
 -------ROUTES-------
 
 */
-
+app.use((req, res,next) =>{
+  let err = true
+  app._router.stack.forEach(r => {
+    if(r.route &&r.route.path){
+      if (req.originalUrl == r.route.path){
+        err=false
+      }
+    }
+  })
+  if(err){
+    logger.warn(req.originalUrl + " es una ruta inexistente")
+  }else{
+    logger.info("Ruta: " + req.originalUrl + "  Metodo: " + req.method)
+  }
+  next()
+});
 
 app.get('/', (req, res) => {
   if(req.session.user){
@@ -161,6 +178,7 @@ app.get('/', (req, res) => {
   else{
     res.redirect("/login")
   }
+  logger.info("Ruta: "+req.url+"  Metodo: GET")
 });
 
 app.get("/profile",(req,res)=>{
@@ -174,8 +192,6 @@ app.get("/api/productos-test",async (req,res)=>{
 
 app.post("/api/productos-test" , async(req,res)=>{
   const {title,price,image} = req.body
-  console.log(title,price,image)
-  console.log(req.body )
   await productsClass.save({title,price,image})
   res.redirect("/api/productos-test")
 })
@@ -191,22 +207,33 @@ app.get("/info",(req,res)=>{
       pathEjecucion:execPath,
       processID:pid,
       carpetaProyecto:argv[1],
-      procesadores:os.cpus()
+      procesadores:os.cpus().length
     }
   )
 })
 
 app.get("/api/randoms",(req,res)=>{
-  const child = fork("apiRandoms.js")
+  const child = fork("./src/apiRandoms.js")
   if(req.query.cant){
     child.send(req.query.cant)
   }else{
-    child.send(100000000)
+    child.send(100)
   }
   child.on("message",childNumbers=>{
     res.json({...childNumbers})
   })
 })
+
+app.get("/sumar", (req,res)=>{
+  const {num1, num2}= req.query;
+  if(!num1 || !num2){logger.error("El usuario no ingreso los numeros");
+  res.send("Por favor ingresa los numeros");
+} else if(!Number.isInteger(parseInt(num1)) || !Number.isInteger(parseInt(num2))){logger.error("Datos invalidos");
+  res.send("Datos invalidos");
+} else{
+  logger.info("La suma fue realizada correctamente")
+  res.send(`la suma es ${parseInt(num1) + parseInt(num2)}`);
+}});
 
 
 /* 

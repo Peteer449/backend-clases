@@ -37,7 +37,6 @@ export default class productsContainer{
         }
       )
     }
-    //console.log(all)
     return all
   }
 }
