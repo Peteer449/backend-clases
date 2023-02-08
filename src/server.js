@@ -1,5 +1,5 @@
-import express, { Router } from "express"
-import { envConfig } from "./envconfig.js"
+import express from "express"
+import { envConfig } from "./envConfig.js"
 import {Server} from "socket.io"
 import path from "path"
 import bodyParser from "body-parser"
