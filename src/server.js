@@ -104,7 +104,7 @@ if(cluster.isPrimary && MODO=="cluster"){
     cluster.fork()
   })
 }else{
-  server = app.listen(PORT,()=>logger.info(`Server listening on port ${PORT} on process ${process.pid}`))
+  server = app.listen(envConfig.PORT,()=>logger.info(`Server listening on port ${PORT} on process ${process.pid}`))
 }
 //server = app.listen(PORT,()=>console.log(`Server listening on port ${PORT} on process ${process.pid}`))
 
