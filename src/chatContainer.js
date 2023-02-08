@@ -1,7 +1,7 @@
 import {readFileSync} from "fs"
 import admin from "firebase-admin"
 const serviceAccount = JSON.parse(readFileSync("./firebaseKey.json"))
-import { envConfig } from "./envconfig.js"
+import { envConfig } from "./envConfig.js"
 
 admin.initializeApp(
   {
