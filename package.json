@@ -6,7 +6,7 @@
   "type": "module",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node src/server.js --p 8080 --modo fork",
+    "start": "node src/server.js",
     "start-cluster": "nodemon src/server.js --modo cluster",
     "build": "babel src/server.js -o src/index.js"
   },

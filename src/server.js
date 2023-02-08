@@ -95,18 +95,21 @@ const chatClass = new chatContainer()
 //Server listener
 let server
 const numberCpus = os.cpus().length
-if(cluster.isPrimary && MODO=="cluster"){
-  for(let i = 0; i<numberCpus;i++){
-    cluster.fork()
-  }
-  cluster.on("exit",worker=>{
-    logger.info(`Este subproceso (${worker.process.pid}) dejo de funcionar`)
-    cluster.fork()
-  })
+if(envConfig.PORT){
+  server = app.listen(envConfig.PORT,()=>logger.info(`Server listening on port ${envConfig.PORT}`))
 }else{
-  server = app.listen(envConfig.PORT,()=>logger.info(`Server listening on port ${PORT} on process ${process.pid}`))
+  if(cluster.isPrimary && MODO=="cluster"){
+    for(let i = 0; i<numberCpus;i++){
+      cluster.fork()
+    }
+    cluster.on("exit",worker=>{
+      logger.info(`Este subproceso (${worker.process.pid}) dejo de funcionar`)
+      cluster.fork()
+    })
+  }else{
+    server = app.listen(PORT,()=>logger.info(`Server listening on port ${PORT} on process ${process.pid}`))
+  }
 }
-//server = app.listen(PORT,()=>console.log(`Server listening on port ${PORT} on process ${process.pid}`))
 
 /*
 
