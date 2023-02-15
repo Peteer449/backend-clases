@@ -21,6 +21,8 @@ import os from "os"
 import cluster from "cluster"
 import compression from "compression"
 import { logger } from "./logger/logger.js"
+import { transporter,adminEmail } from "./messages/email.js"
+import {twilioClient, twilioPhone, adminPhone} from "./messages/wpp.js"
 
 const app = express()
 mongoose.set('strictQuery', true);
@@ -237,6 +239,33 @@ app.get("/sumar", (req,res)=>{
   logger.info("La suma fue realizada correctamente")
   res.send(`la suma es ${parseInt(num1) + parseInt(num2)}`);
 }});
+
+app.post("/envio-mensaje",async (req,res)=>{
+  try {
+    await transporter.sendMail({
+      from:"server app Node",
+      to:adminEmail,
+      subject:"Email de prueba",
+      html:"<div>Holo</div>"
+    })
+    res.send("el mensaje se envio correctamente")
+  } catch (error) {
+    res.send(error)
+  }
+})
+
+app.post("/envio-wpp", async(req,res)=>{
+  try {
+    await twilioClient.messages.create({
+      from:twilioPhone,
+      to:adminPhone,
+      body:"algo"
+    })
+    res.send("el mensaje se envio correctamente")
+  } catch (error) {
+    res.send(error)
+  }
+})
 
 
 /* 
