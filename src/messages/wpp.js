@@ -1,7 +1,8 @@
 import twilio from "twilio"
+import { envConfig } from "../envConfig.js"
 
 const accountId = "AC0ca3aacecb921c21d262e8afef773cf8"
-const tokenTwilio = "ade14a621e3ee996446a6da92b7d26d3"
+const tokenTwilio = envConfig.TOKENTWILIO
 
 const twilioPhone = "whatsapp:+14155238886"
 const adminPhone = "whatsapp:+5491167056074"

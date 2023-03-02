@@ -1,14 +1,4 @@
-import {readFileSync} from "fs"
 import admin from "firebase-admin"
-const serviceAccount = JSON.parse(readFileSync("./firebaseKey.json"))
-import { envConfig } from "./envConfig.js"
-
-admin.initializeApp(
-  {
-    credential:admin.credential.cert(serviceAccount),
-    databaseURL:envConfig.BASE_DE_DATOS_FIREBASE
-  }
-)
 
 
 export default class chatContainer{

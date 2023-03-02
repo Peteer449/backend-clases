@@ -1,7 +1,8 @@
 import nodemailer from "nodemailer"
+import { envConfig } from "../envConfig.js";
 
 const adminEmail='pedro.esposito99@gmail.com'
-const adminPassword='bmpuuglmiideziwh'
+const adminPassword= envConfig.GMAILPASSWORD
 
 const transporter = nodemailer.createTransport({
   host: 'smtp.gmail.com',

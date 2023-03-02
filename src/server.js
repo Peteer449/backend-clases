@@ -8,21 +8,17 @@ import handlebars from "express-handlebars"
 import { normalize, schema } from "normalizr";
 import cookieParser from "cookie-parser";
 import session from "express-session";
-import MongoStore from "connect-mongo"; 
 import passport from "passport";
-import { Strategy as LocalStrategy} from "passport-local";
 import mongoose from "mongoose";
-import { UserModel } from "./models/user.js";
-import bcrypt from "bcrypt"
+import { UserModel } from "./dbOperations/models/user.model.js";
 import flash from "connect-flash"
 import parseArgs from "minimist"
-import { fork } from "child_process"
 import os from "os"
 import cluster from "cluster"
 import compression from "compression"
 import { logger } from "./logger/logger.js"
-import { transporter,adminEmail } from "./messages/email.js"
-import {twilioClient, twilioPhone, adminPhone} from "./messages/wpp.js"
+import {connectCoderdb, connectMongoSession} from "./config/dbConnection.js"
+import {router} from "./routes/index.js"
 
 const app = express()
 mongoose.set('strictQuery', true);
@@ -44,24 +40,8 @@ app.use(compression())
 -------COOKIES AND MONGODB-------
 
 */
-const advancedOptions = {useNewUrlParser:true,useUnifiedTopology:true}
-app.use(session({
-  store: MongoStore.create({
-    mongoUrl:envConfig.BASE_DE_DATOS_SESSIONSDB,
-    mongoOptions:advancedOptions,
-    ttl:60
-  }),
-  secret:"clave",
-  resave:false,
-  saveUninitialized:false
-}))
-mongoose.connect(envConfig.BASE_DE_DATOS_CODERDB,{
-  useNewUrlParser:true,
-  useUnifiedTopology:true,
-},(error=>{
-  if(error)logger.error("Conexion fallida")
-  logger.info("conectado correctamente")
-}))
+app.use(session(connectMongoSession()))
+connectCoderdb()
 
 
 /*
@@ -89,10 +69,8 @@ const PORT = argumentsMinimist.port
 const MODO = argumentsMinimist.modo
 
 //Import classes
-import productsContainer from "./productsContainer.js";
-import chatContainer from "./chatContainer.js";
-const productsClass = new productsContainer()
-const chatClass = new chatContainer()
+import { ProductsService, ChatService } from "./services/productsAndChat.services.js"
+
 
 //Server listener
 let server
@@ -138,16 +116,16 @@ const normalizarData = (data)=>{
   return dataNormalizada;
 }
 const normalizarMensajes = async()=>{
-  const messages = await chatClass.getAll()
+  const messages = await ChatService.getChat()
   const normalizedMessages = normalizarData(messages)
   return normalizedMessages
 }
 
 io.on("connection",async (socket)=>{
   socket.emit("allMessages",await normalizarMensajes())
-  socket.emit("allProducts",await productsClass.getAll())
+  socket.emit("allProducts",await ProductsService.getProducts())
   socket.on("chatInput",async data=>{
-    await chatClass.save(data)
+    await ChatService.save(data)
     io.sockets.emit("allMessages",await normalizarMensajes())
   })
 })
@@ -158,214 +136,4 @@ io.on("connection",async (socket)=>{
 -------ROUTES-------
 
 */
-app.use((req, res,next) =>{
-  let err = true
-  app._router.stack.forEach(r => {
-    if(r.route &&r.route.path){
-      if (req.originalUrl == r.route.path){
-        err=false
-      }
-    }
-  })
-  if(err){
-    logger.warn(req.originalUrl + " es una ruta inexistente")
-  }else{
-    logger.info("Ruta: " + req.originalUrl + "  Metodo: " + req.method)
-  }
-  next()
-});
-
-app.get('/', (req, res) => {
-  if(req.session.user){
-    let user = req.session.user.name
-    res.render("home",{user})
-  }
-  else{
-    res.redirect("/login")
-  }
-  logger.info("Ruta: "+req.url+"  Metodo: GET")
-});
-
-app.get("/profile",(req,res)=>{
-  res.render("profile")
-})
-
-app.get("/api/productos-test",async (req,res)=>{
-  const allProducts = await productsClass.getAll()
-  res.render("products",{allProducts})
-})
-
-app.post("/api/productos-test" , async(req,res)=>{
-  const {title,price,image} = req.body
-  await productsClass.save({title,price,image})
-  res.redirect("/api/productos-test")
-})
-
-app.get("/info",(req,res)=>{
-  const {argv,platform,versions,pid,execPath,memoryUsage} = process
-  res.json(
-    {
-      argumentosDeEntrada:argumentsMinimist,
-      plataforma:platform,
-      versionNode:versions.node,
-      RSS:memoryUsage.rss(),
-      pathEjecucion:execPath,
-      processID:pid,
-      carpetaProyecto:argv[1],
-      procesadores:os.cpus().length
-    }
-  )
-})
-
-app.get("/api/randoms",(req,res)=>{
-  const child = fork("./src/apiRandoms.js")
-  if(req.query.cant){
-    child.send(req.query.cant)
-  }else{
-    child.send(100)
-  }
-  child.on("message",childNumbers=>{
-    res.json({...childNumbers})
-  })
-})
-
-app.get("/sumar", (req,res)=>{
-  const {num1, num2}= req.query;
-  if(!num1 || !num2){logger.error("El usuario no ingreso los numeros");
-  res.send("Por favor ingresa los numeros");
-} else if(!Number.isInteger(parseInt(num1)) || !Number.isInteger(parseInt(num2))){logger.error("Datos invalidos");
-  res.send("Datos invalidos");
-} else{
-  logger.info("La suma fue realizada correctamente")
-  res.send(`la suma es ${parseInt(num1) + parseInt(num2)}`);
-}});
-
-app.post("/envio-mensaje",async (req,res)=>{
-  try {
-    await transporter.sendMail({
-      from:"server app Node",
-      to:adminEmail,
-      subject:"Email de prueba",
-      html:"<div>Holo</div>"
-    })
-    res.send("el mensaje se envio correctamente")
-  } catch (error) {
-    res.send(error)
-  }
-})
-
-app.post("/envio-wpp", async(req,res)=>{
-  try {
-    await twilioClient.messages.create({
-      from:twilioPhone,
-      to:adminPhone,
-      body:"algo"
-    })
-    res.send("el mensaje se envio correctamente")
-  } catch (error) {
-    res.send(error)
-  }
-})
-
-
-/* 
-
--------LOGIN LOGOUT-------
-
-*/
-
-app.get("/login",(req,res)=>{
-  if(req.session.username){
-    return res.send("Ya estas logueado")
-  }
-  if(req.session.username){
-    res.redirect("/")
-  }
-  else{
-    res.render("login",{error:req.flash('error')[0]})
-  }
-})
-
-app.get("/logout",(req,res)=>{
-  const user = req.session.user
-  req.session.destroy(error=>{
-    if(!error)return res.render("logout",{user:user.name})
-    res.send(`Error: ${error}`).status(500)
-  })
-})
-
-passport.use("loginStrategy",new LocalStrategy(
-  {
-    usernameField:"mail"
-  },
-  (username,password,done)=>{
-    UserModel.findOne({mail:username},(err,userFound)=>{
-      if(err) return done(err)
-      if(!userFound)return done(null,false,{message:"No se encontro el usuario"})
-      if(userFound){
-        bcrypt.compare(password, userFound.password, function(err, result) {
-          if(result){
-            return done(null,userFound)
-          }
-          return done(null,false,{message:"Contraseña incorrecta"})
-      });
-      }
-    })
-  }
-))
-
-app.post("/login",passport.authenticate("loginStrategy",{
-  failureRedirect:"/login",
-  failureMessage:true,
-  failureFlash: true
-}), async (req,res)=>{
-  req.session.user = req.user
-  res.redirect("/")
-})
-
-
-/*
-
--------SIGNUP-------
-
-*/
-
-
-app.get("/signup",(req,res)=>{
-  res.render("signup",{error:req.flash('error')[0]})
-})
-
-passport.use("signupStrategy",new LocalStrategy(
-  {
-    passReqToCallback:true,
-    usernameField:"mail",
-  },
-  (req,username,password,done)=>{
-    UserModel.findOne({mail:username},(err,userFound)=>{
-      if(err) return done(err)
-      if(userFound)return done(null,false,{message:"El usuario ya existe"})
-      const saltRounds = 10;
-      bcrypt.genSalt(saltRounds, function(err, salt) {
-        bcrypt.hash(password, salt, function(err, hash) {
-          const newUser = {
-            name:req.body.name,
-            mail:username,
-            password:hash
-          }
-          UserModel.create(newUser,(error,userCreated)=>{
-            if(err)return done(error,null,{message:"Error al crear el usuario"})
-            return done(null,userCreated)
-          })
-        })
-      })
-    })
-  }
-))
-
-app.post("/signup", passport.authenticate("signupStrategy",{
-  failureRedirect:"/signup",
-  failureMessage:true,
-  failureFlash:true
-}),(req,res)=>{
-  res.redirect("/login")
-})
+app.use("" , router)
