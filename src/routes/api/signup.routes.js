@@ -3,7 +3,7 @@ import passport from "passport";
 import bcrypt from "bcrypt"
 import { Strategy as LocalStrategy} from "passport-local";
 import { UserService } from "../../services/user.services.js";
-import { UserModel } from "../../dbOperations/models/user.model.js";
+import { UserModel } from "../../model/models/user.model.js";
 
 const router = express.Router();
 

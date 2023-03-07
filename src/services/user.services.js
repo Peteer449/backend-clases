@@ -1,8 +1,13 @@
-import { UserManager } from "../dbOperations/index.js";
+// import { UserManager } from "../model/index.js";
+import { getApiDao } from "../model/index.js";
+import { convertUserToDto } from "../model/dtos/user.dto.js";
+const {UserManager} = await getApiDao("mongo")
 
 class UserService{
   static async getUsers(){
-    return await UserManager.getAll()
+    const users = await UserManager.getAll()
+    const usersDto = convertUserToDto(users)
+    return usersDto
   }
 }
 

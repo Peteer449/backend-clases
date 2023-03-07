@@ -2,3 +2,63 @@
 [2023-02-08T10:31:32.843] [WARN] prod - /favicon.ico es una ruta inexistente
 [2023-03-01T13:43:56.929] [WARN] prod - /favicon.ico es una ruta inexistente
 [2023-03-02T10:16:13.199] [WARN] prod - /favicon.ico es una ruta inexistente
+[2023-03-07T09:25:54.536] [ERROR] prod - FirebaseAppError: The default Firebase app already exists. This means you called initializeApp() more than once without providing an app name as the second argument. In most cases you only need to call initializeApp() once. But if you do want to initialize multiple apps, pass a second argument to initializeApp() to give each app a unique name.
+    at AppStore.initializeApp (C:\Users\Pedro\Desktop\backend-clases\node_modules\firebase-admin\lib\app\lifecycle.js:41:23)
+    at FirebaseNamespaceInternals.initializeApp (C:\Users\Pedro\Desktop\backend-clases\node_modules\firebase-admin\lib\app\firebase-namespace.js:43:35)
+    at FirebaseNamespace.initializeApp (C:\Users\Pedro\Desktop\backend-clases\node_modules\firebase-admin\lib\app\firebase-namespace.js:246:30)
+    at MyFirebaseClient.connect (file:///C:/Users/Pedro/Desktop/backend-clases/src/model/clients/dbClientFirebase.js:13:25)
+    at getApiDao (file:///C:/Users/Pedro/Desktop/backend-clases/src/model/index.js:21:26) {
+  errorInfo: {
+    code: 'app/duplicate-app',
+    message: 'The default Firebase app already exists. This means you called initializeApp() more than once without providing an app name as the second argument. In most cases you only need to call initializeApp() once. But if you do want to initialize multiple apps, pass a second argument to initializeApp() to give each app a unique name.'
+  },
+  codePrefix: 'app'
+}
+[2023-03-07T09:25:54.541] [ERROR] prod - FirebaseAppError: The default Firebase app already exists. This means you called initializeApp() more than once without providing an app name as the second argument. In most cases you only need to call initializeApp() once. But if you do want to initialize multiple apps, pass a second argument to initializeApp() to give each app a unique name.
+    at AppStore.initializeApp (C:\Users\Pedro\Desktop\backend-clases\node_modules\firebase-admin\lib\app\lifecycle.js:41:23)
+    at FirebaseNamespaceInternals.initializeApp (C:\Users\Pedro\Desktop\backend-clases\node_modules\firebase-admin\lib\app\firebase-namespace.js:43:35)
+    at FirebaseNamespace.initializeApp (C:\Users\Pedro\Desktop\backend-clases\node_modules\firebase-admin\lib\app\firebase-namespace.js:246:30)
+    at MyFirebaseClient.connect (file:///C:/Users/Pedro/Desktop/backend-clases/src/model/clients/dbClientFirebase.js:13:25)
+    at getApiDao (file:///C:/Users/Pedro/Desktop/backend-clases/src/model/index.js:21:26) {
+  errorInfo: {
+    code: 'app/duplicate-app',
+    message: 'The default Firebase app already exists. This means you called initializeApp() more than once without providing an app name as the second argument. In most cases you only need to call initializeApp() once. But if you do want to initialize multiple apps, pass a second argument to initializeApp() to give each app a unique name.'
+  },
+  codePrefix: 'app'
+}
+[2023-03-07T09:26:03.094] [ERROR] prod - FirebaseAppError: The default Firebase app already exists. This means you called initializeApp() more than once without providing an app name as the second argument. In most cases you only need to call initializeApp() once. But if you do want to initialize multiple apps, pass a second argument to initializeApp() to give each app a unique name.
+    at AppStore.initializeApp (C:\Users\Pedro\Desktop\backend-clases\node_modules\firebase-admin\lib\app\lifecycle.js:41:23)
+    at FirebaseNamespaceInternals.initializeApp (C:\Users\Pedro\Desktop\backend-clases\node_modules\firebase-admin\lib\app\firebase-namespace.js:43:35)
+    at FirebaseNamespace.initializeApp (C:\Users\Pedro\Desktop\backend-clases\node_modules\firebase-admin\lib\app\firebase-namespace.js:246:30)
+    at MyFirebaseClient.connect (file:///C:/Users/Pedro/Desktop/backend-clases/src/model/clients/dbClientFirebase.js:13:25)
+    at getApiDao (file:///C:/Users/Pedro/Desktop/backend-clases/src/model/index.js:21:26) {
+  errorInfo: {
+    code: 'app/duplicate-app',
+    message: 'The default Firebase app already exists. This means you called initializeApp() more than once without providing an app name as the second argument. In most cases you only need to call initializeApp() once. But if you do want to initialize multiple apps, pass a second argument to initializeApp() to give each app a unique name.'
+  },
+  codePrefix: 'app'
+}
+[2023-03-07T09:26:03.100] [ERROR] prod - FirebaseAppError: The default Firebase app already exists. This means you called initializeApp() more than once without providing an app name as the second argument. In most cases you only need to call initializeApp() once. But if you do want to initialize multiple apps, pass a second argument to initializeApp() to give each app a unique name.
+    at AppStore.initializeApp (C:\Users\Pedro\Desktop\backend-clases\node_modules\firebase-admin\lib\app\lifecycle.js:41:23)
+    at FirebaseNamespaceInternals.initializeApp (C:\Users\Pedro\Desktop\backend-clases\node_modules\firebase-admin\lib\app\firebase-namespace.js:43:35)
+    at FirebaseNamespace.initializeApp (C:\Users\Pedro\Desktop\backend-clases\node_modules\firebase-admin\lib\app\firebase-namespace.js:246:30)
+    at MyFirebaseClient.connect (file:///C:/Users/Pedro/Desktop/backend-clases/src/model/clients/dbClientFirebase.js:13:25)
+    at getApiDao (file:///C:/Users/Pedro/Desktop/backend-clases/src/model/index.js:21:26) {
+  errorInfo: {
+    code: 'app/duplicate-app',
+    message: 'The default Firebase app already exists. This means you called initializeApp() more than once without providing an app name as the second argument. In most cases you only need to call initializeApp() once. But if you do want to initialize multiple apps, pass a second argument to initializeApp() to give each app a unique name.'
+  },
+  codePrefix: 'app'
+}
+[2023-03-07T09:26:49.189] [ERROR] prod - FirebaseAppError: The default Firebase app already exists. This means you called initializeApp() more than once without providing an app name as the second argument. In most cases you only need to call initializeApp() once. But if you do want to initialize multiple apps, pass a second argument to initializeApp() to give each app a unique name.
+    at AppStore.initializeApp (C:\Users\Pedro\Desktop\backend-clases\node_modules\firebase-admin\lib\app\lifecycle.js:41:23)
+    at FirebaseNamespaceInternals.initializeApp (C:\Users\Pedro\Desktop\backend-clases\node_modules\firebase-admin\lib\app\firebase-namespace.js:43:35)
+    at FirebaseNamespace.initializeApp (C:\Users\Pedro\Desktop\backend-clases\node_modules\firebase-admin\lib\app\firebase-namespace.js:246:30)
+    at MyFirebaseClient.connect (file:///C:/Users/Pedro/Desktop/backend-clases/src/model/clients/dbClientFirebase.js:13:25)
+    at getApiDao (file:///C:/Users/Pedro/Desktop/backend-clases/src/model/index.js:21:26) {
+  errorInfo: {
+    code: 'app/duplicate-app',
+    message: 'The default Firebase app already exists. This means you called initializeApp() more than once without providing an app name as the second argument. In most cases you only need to call initializeApp() once. But if you do want to initialize multiple apps, pass a second argument to initializeApp() to give each app a unique name.'
+  },
+  codePrefix: 'app'
+}

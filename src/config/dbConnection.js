@@ -31,12 +31,12 @@ const connectMongoSession = () => {
   })
 }
 
-admin.initializeApp(
-  {
-    credential:admin.credential.cert(serviceAccount),
-    databaseURL:options.firebase.url
-  }
-)
+// admin.initializeApp(
+//   {
+//     credential:admin.credential.cert(serviceAccount),
+//     databaseURL:options.firebase.url
+//   }
+// )
 
 
 export {connectCoderdb, connectMongoSession}
