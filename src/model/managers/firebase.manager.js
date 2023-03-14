@@ -94,11 +94,11 @@ class FirebaseContainer{
         }
     }
 
-    async updateById(body, id){
+    async updateById(id){
         try {
             const doc = this.collection.doc(`${id}`)
-            let item = await doc.update({body})
-            return {message:`updateaste ${item}`}
+            await doc.update({updated:true})
+            return this.getById(id)
         } catch (error) {
             return {message:`Error al actualizar: no se encontró el id ${id}`};
         }
@@ -107,8 +107,8 @@ class FirebaseContainer{
     async deleteById(id){
         try {
             const doc = this.collection.doc(`${id}`)
-            const item = await doc.delete()
-            return{message:`Borraste ${item}`}
+            await doc.delete()
+            return {message:"deleted successfully"}
         } catch (error) {
             return {message:`Error al borrar: no se encontró el id ${id}`};
         }

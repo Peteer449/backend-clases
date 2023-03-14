@@ -3,31 +3,28 @@ import { envConfig } from "./envConfig.js"
 import {Server} from "socket.io"
 import path from "path"
 import bodyParser from "body-parser"
-import {fileURLToPath} from 'url';
+import __dirname from "./utils.js"
 import handlebars from "express-handlebars"
 import { normalize, schema } from "normalizr";
 import cookieParser from "cookie-parser";
 import session from "express-session";
 import passport from "passport";
-import mongoose from "mongoose";
-import { UserModel } from "./dbOperations/models/user.model.js";
+import { UserModel } from "./model/models/user.model.js";
 import flash from "connect-flash"
-import parseArgs from "minimist"
 import os from "os"
 import cluster from "cluster"
 import compression from "compression"
 import { logger } from "./logger/logger.js"
-import {connectCoderdb, connectMongoSession} from "./config/dbConnection.js"
+import {connectMongoSession} from "./config/dbConnection.js"
 import {router} from "./routes/index.js"
+import { options } from "./config/options.js"
 
 const app = express()
-mongoose.set('strictQuery', true);
+export {app}
 app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({extended:true}));
 app.use(express.json())
 app.engine("handlebars",handlebars.engine())
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
 app.set("views",path.join(__dirname,"views"))
 app.set("view engine","handlebars")
 app.use(express.static("./views"))
@@ -41,7 +38,6 @@ app.use(compression())
 
 */
 app.use(session(connectMongoSession()))
-connectCoderdb()
 
 
 /*
@@ -63,10 +59,8 @@ passport.deserializeUser((id,done)=>{
 })
 
 //Port of the server
-const optionsMinimist = {default:{p:8080, modo:"fork"},alias:{p:"port"}}
-const argumentsMinimist = parseArgs(process.argv.slice(2),optionsMinimist)
-const PORT = argumentsMinimist.port
-const MODO = argumentsMinimist.modo
+const PORT = options.server.PORT
+const MODO = options.server.MODE
 
 //Import classes
 import { ProductsService, ChatService } from "./services/productsAndChat.services.js"

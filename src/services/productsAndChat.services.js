@@ -1,5 +1,5 @@
-import { FirebaseManagerProducts } from "../dbOperations/index.js";
-import { FirebaseManagerChat } from "../dbOperations/index.js";
+import { getApiDao } from "../model/index.js";
+const {FirebaseManagerChat,FirebaseManagerProducts} = await getApiDao("firebase")
 
 class ProductsService{
   static async getProducts(){
@@ -7,6 +7,12 @@ class ProductsService{
   }
   static async saveProduct(product){
     return await FirebaseManagerProducts.save(product)
+  }
+  static async deleteProduct(id){
+    return await FirebaseManagerProducts.deleteById(id)
+  }
+  static async updateProduct(id){
+    return await FirebaseManagerProducts.updateById(id)
   }
 }
 
