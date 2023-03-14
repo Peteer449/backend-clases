@@ -20,6 +20,7 @@ import {router} from "./routes/index.js"
 import { options } from "./config/options.js"
 
 const app = express()
+export {app}
 app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({extended:true}));
 app.use(express.json())

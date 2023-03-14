@@ -2,9 +2,6 @@ import mongoose from "mongoose";
 import {options} from "./options.js"
 import { logger } from "../logger/logger.js";
 import MongoStore from "connect-mongo";
-import {readFileSync} from "fs"
-import admin from "firebase-admin"
-const serviceAccount = JSON.parse(readFileSync("firebaseKey.json"))
 
 
 const connectCoderdb = () => {
@@ -30,13 +27,5 @@ const connectMongoSession = () => {
     saveUninitialized:false
   })
 }
-
-// admin.initializeApp(
-//   {
-//     credential:admin.credential.cert(serviceAccount),
-//     databaseURL:options.firebase.url
-//   }
-// )
-
 
 export {connectCoderdb, connectMongoSession}
