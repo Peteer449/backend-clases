@@ -18,6 +18,7 @@ import { logger } from "./logger/logger.js"
 import {connectMongoSession} from "./config/dbConnection.js"
 import {router} from "./routes/index.js"
 import { options } from "./config/options.js"
+import { graphqlController } from "./controllers/products.graphql.controller.js"
 
 const app = express()
 export {app}
@@ -131,3 +132,4 @@ io.on("connection",async (socket)=>{
 
 */
 app.use("" , router)
+app.use("/graphql",graphqlController())

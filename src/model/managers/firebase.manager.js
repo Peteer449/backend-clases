@@ -14,7 +14,7 @@ class FirebaseContainer{
             const product =  this.collection.doc(`${id}`);
             const item = await product.get()
             const response = item.data()
-            return response
+            return {id:id,...response}
         } catch (error) {
             return {message:`Hubo un error ${error}`, error:true};
         }
@@ -44,7 +44,7 @@ class FirebaseContainer{
         all.push(
           {
             id:elm.id,
-            ...elm.data().product
+            ...elm.data()
           }
         )
       });
@@ -67,7 +67,8 @@ class FirebaseContainer{
                 let {title,price,image}=product
                 price=parseInt(price)
                 let doc = this.collection.doc()
-                await doc.create({product})
+                const addDoc = await this.collection.add({title,price,image})
+                return {id:addDoc._path.segments[1],title,price,image}
             }else if(product.timestamp){
                 if(bool){
                     const snapshot =await this.collection.get()

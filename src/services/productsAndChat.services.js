@@ -22,4 +22,24 @@ class ChatService{
   }
 }
 
-export {ProductsService,ChatService}
+const rootProducts = {
+  getProducts:async()=>{
+      return await FirebaseManagerProducts.getAllProducts();
+  },
+
+  getProductById:async({id})=>{
+    return await FirebaseManagerProducts.getById(id)
+  },
+
+  addProduct:async({product})=>{
+    return await FirebaseManagerProducts.save(product)
+  },
+  deleteProduct:async({id})=>{
+    return await FirebaseManagerProducts.deleteById(id)
+  },
+  updateProductById:async({id})=>{
+    return await FirebaseManagerProducts.updateById(id)
+  }
+};
+
+export {ProductsService,ChatService,rootProducts}
